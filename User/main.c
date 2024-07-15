@@ -62,8 +62,8 @@ do \
 } \
 while(0)
 
-#define SEM_CNT_MAX             (1000U)
-#define QUEUE_LENGTH            (1000U)
+#define SEM_CNT_MAX             (10010U)
+#define QUEUE_LENGTH            (10010U)
 #define QUEUE_ITEM_SIZE         sizeof(uint32_t)
 /* End Define ****************************************************************/
 
@@ -76,6 +76,16 @@ volatile uint16_t Min=0U;
 volatile uint16_t Max=0U;
 volatile uint32_t Overflow=0U;
 volatile uint32_t Total=0U;
+
+volatile uint32_t Notify_ISR_Total=0;
+volatile uint32_t Notify_ISR_Max=0;
+volatile uint32_t Notify_ISR_Min=0;
+volatile uint32_t Sem_ISR_Total=0;
+volatile uint32_t Sem_ISR_Max=0;
+volatile uint32_t Sem_ISR_Min=0;
+volatile uint32_t Bmq_ISR_Total=0;
+volatile uint32_t Bmq_ISR_Max=0;
+volatile uint32_t Bmq_ISR_Min=0;
 
 TaskHandle_t Thd_1;
 TaskHandle_t Thd_2;
@@ -110,7 +120,7 @@ void Test_Yield_1(void)
     }
 }
 
-void Test_Mail_1(void)
+void Test_Notify_1(void)
 {
     int32_t Count;
     for(Count=0;Count<ROUND_NUM;Count++)
@@ -151,7 +161,7 @@ void Func_1(void* pvParameters)
     Test_Yield_1();
     /* Change priority of thread 2 */
     vTaskPrioritySet(Thd_2,2U);
-    Test_Mail_1();
+    Test_Notify_1();
     Test_Sem_1();
     Test_Bmq_1();
     
@@ -189,7 +199,7 @@ void Test_Yield_2(void)
     }
 }
 
-void Test_Mail_2(void)
+void Test_Notify_2(void)
 {
     int32_t Count;
     uint32_t Data;
@@ -214,7 +224,6 @@ void Test_Sem_2(void)
     }
 }
 
-
 void Test_Bmq_2(void)
 {
     int32_t Count;
@@ -225,6 +234,48 @@ void Test_Bmq_2(void)
         xQueueReceive(Queue_1,&Data,portMAX_DELAY);
         End=TEST_CNT_READ();
         TEST_DATA();
+    }
+}
+
+void Test_Notify_ISR(void)
+{
+    uint32_t Data;
+    static int32_t Count;
+    for(Count=0;Count<ROUND_NUM;Count++)
+    {
+        xTaskNotifyWait(0x00,0xFFFFFFFF,&Data,portMAX_DELAY);
+        /* Read counter here */
+        End=TEST_CNT_READ();
+        TEST_DATA();
+        Flip=0U;
+    }
+}
+
+
+void Test_Sem_ISR(void)
+{
+    static int32_t Count;
+    for(Count=0;Count<ROUND_NUM;Count++)
+    {
+        xSemaphoreTake(Sem_1,portMAX_DELAY);
+        /* Read counter here */
+        End=TEST_CNT_READ();
+        TEST_DATA();
+        Flip=0U;
+    }
+}
+
+void Test_Bmq_ISR(void)
+{
+    uint32_t Data;
+    static int32_t Count;
+    for(Count=0;Count<ROUND_NUM;Count++)
+    {
+        xQueueReceive(Queue_1,&Data,portMAX_DELAY);
+        /* Read counter here */
+        End=TEST_CNT_READ();
+        TEST_DATA();
+        Flip=0U;
     }
 }
 
@@ -353,10 +404,9 @@ void Func_2(void* pvParameters)
     
     /* Mailbox tests */
     TEST_INIT();
-    Test_Mail_2();
+    Test_Notify_2();
     TEST_LIST("Task notifications                ");
 
-    
     /* Semaphore tests */
     TEST_INIT();
     Test_Sem_2();
@@ -376,6 +426,43 @@ void Func_2(void* pvParameters)
     
     /* Prepare interrupt tests */
     Int_Init();
+    
+    /* Task notification from interrupt tests */
+    TEST_INIT();
+    Test_Notify_ISR();
+    Notify_ISR_Total=Total;
+    Notify_ISR_Max=Max;
+    Notify_ISR_Min=Min;
+    
+    /* Semaphore from interrupt tests */
+    TEST_INIT();
+    Test_Sem_ISR();
+    Sem_ISR_Total=Total;
+    Sem_ISR_Max=Max;
+    Sem_ISR_Min=Min;
+    
+    /* Blocking message queue from interrupt tests */
+    TEST_INIT();
+    Test_Bmq_ISR();
+    Bmq_ISR_Total=Total;
+    Bmq_ISR_Max=Max;
+    Bmq_ISR_Min=Min;
+    
+    
+    Total=Notify_ISR_Total;
+    Max=Notify_ISR_Max;
+    Min=Notify_ISR_Min;
+    TEST_LIST("ISR Mailbox                       ");
+    
+    Total=Sem_ISR_Total;
+    Max=Sem_ISR_Max;
+    Min=Sem_ISR_Min;
+    TEST_LIST("ISR Semaphore                     ");
+    
+    Total=Bmq_ISR_Total;
+    Max=Bmq_ISR_Max;
+    Min=Bmq_ISR_Min;
+    TEST_LIST("ISR Blocking message queue        ");
     
     /* Test stop - Decide whether to exit, or keep dumping counter values
      * to detect potentially wrong timer clock rate configurations */
@@ -409,7 +496,9 @@ Return      : None.
 void Int_Handler(void)
 {
     BaseType_t Retval;
+    BaseType_t Task_Woke=pdFALSE;
     static uint32_t Count=0U;
+    uint32_t Val_Snt=1U;
     
     if(Flip!=0U)
         Print_Str("Interrupt reentered.\r\n");
@@ -420,37 +509,32 @@ void Int_Handler(void)
     {
         Count++;
         Start=TEST_CNT_READ();
-        /* Send to queue here */
-        //Retval=RMP_Thd_Snd_ISR(&Thd_2, 1U);
-        if(Retval<0)
-        {
-            Print_Str("ISR Mailbox send failed with code ");
-            Print_Int(Retval);
-            Print_Str(": ");
-            Print_Int(Count);
-            Print_Str(" sends.\r\n");
-        }
+        xTaskNotifyFromISR(Thd_2,1U,eSetValueWithOverwrite,&Task_Woke);
+        portYIELD_FROM_ISR(Task_Woke);
     }
     else if(Count<ROUND_NUM*2U)
     {
-//        Count++;
-//        Start=RMP_CNT_READ();
-//        Retval=RMP_Sem_Post_ISR(&Sem_1, 1U);
-//        if(Retval<0)
-//        {
-//            RMP_DBG_S("ISR semaphore post failed with code ");
-//            RMP_DBG_I(Retval);
-//            RMP_DBG_S(": ");
-//            RMP_DBG_I(Count);
-//            RMP_DBG_S(" posts.\r\n");
-//        }
+        Count++;
+        Start=TEST_CNT_READ();
+        Retval=xSemaphoreGiveFromISR(Sem_1,&Task_Woke);
+        portYIELD_FROM_ISR(Task_Woke);
+        if(Retval!=pdTRUE)
+            Print_Str("ISR semaphore post failed.\r\n");
+    }
+    else if(Count<ROUND_NUM*3U)
+    {
+        Count++;
+        Start=TEST_CNT_READ();
+        Retval=xQueueSendFromISR(Queue_1,&Val_Snt,&Task_Woke);
+        portYIELD_FROM_ISR(Task_Woke);
+        if(Retval!=pdTRUE)
+            Print_Str("ISR bmq message send failed.\r\n");
     }
     else
     {
         Retval=0;
         Int_Disable();
     }
-    
 }
 /* End Function:Int_Handler **************************************************/
 

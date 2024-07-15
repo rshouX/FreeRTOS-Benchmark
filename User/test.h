@@ -177,7 +177,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 void TIM4_IRQHandler(void)
 {
     TIM4->SR=~TIM_FLAG_UPDATE;
-//    Int_Handler();
+    Int_Handler();
 }
 /* End Function:Int_Init *****************************************************/
 

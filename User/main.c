@@ -325,14 +325,15 @@ void Test_Mem_Pool(void)
 
         /* This should always be successful because we deallocated everything else, and
          * management data structure should never take up more than 1/8 of the pool. */
-//        Mem[0]=pvPortMalloc(TEST_MEM_POOL*sizeof(uint32_t)*7U/8U);
-//        if(Mem[0]==NULL)
-//        {
-//            Print_Str("Memory test failure: ");
-//            Print_Int(Test_Cnt);
-//            Print_Str(" runs.\r\n");
-//            while(1);
-//        }
+        Mem[0]=pvPortMalloc(TEST_MEM_POOL*sizeof(uint32_t)*7U/8U);
+        if(Mem[0]==NULL)
+        {
+            Print_Str("Memory test failure: ");
+            Print_Int(Test_Cnt);
+            Print_Str(" runs.\r\n");
+            while(1);
+        }
+        vPortFree(Mem[0]);
     }
     
     Total/=8U;

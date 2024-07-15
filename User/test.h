@@ -136,6 +136,65 @@ void Timer_Init(void)
 }
 /* End Function:Timer_Init ***************************************************/
 
+/* Function:Int_Init **********************************************************
+Description : Initialize an periodic interrupt source. This function needs
+              to be adapted to your specific hardware.
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void Int_Init(void)
+{
+    /* TIM4 clock = 1/2 CPU clock */
+    TIM4_Handle.Instance=TIM4;
+    TIM4_Handle.Init.Prescaler=0;
+    TIM4_Handle.Init.CounterMode=TIM_COUNTERMODE_DOWN;
+    TIM4_Handle.Init.Period=21600;
+    TIM4_Handle.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
+    TIM4_Handle.Init.RepetitionCounter=0;
+    HAL_TIM_Base_Init(&TIM4_Handle);
+    __HAL_RCC_TIM4_CLK_ENABLE();
+    __HAL_TIM_ENABLE(&TIM4_Handle);
+    /* Clear interrupt pending bit, because we used EGR to update the registers */
+    __HAL_TIM_CLEAR_IT(&TIM4_Handle, TIM_IT_UPDATE);
+    HAL_TIM_Base_Start_IT(&TIM4_Handle);
+}
+
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+{
+    if(htim->Instance==TIM4) 
+    {
+        /* Set the interrupt priority */
+        NVIC_SetPriority(TIM4_IRQn,0xFF);
+        /* Enable timer 4 interrupt */
+        NVIC_EnableIRQ(TIM4_IRQn);
+        /* Enable timer 4 clock */
+        __HAL_RCC_TIM4_CLK_ENABLE();
+    }
+}
+
+/* The interrupt handler */
+void TIM4_IRQHandler(void)
+{
+    TIM4->SR=~TIM_FLAG_UPDATE;
+//    Int_Handler();
+}
+/* End Function:Int_Init *****************************************************/
+
+/* Function:Int_Disable *******************************************************
+Description : Disable the periodic interrupt source. This function needs
+              to be adapted to your specific hardware.
+Input       : None.
+Output      : None.
+Return      : None.
+******************************************************************************/
+void Int_Disable(void)
+{
+    /* Disable timer 4 interrupt */
+    NVIC_DisableIRQ(TIM4_IRQn);
+}
+/* End Function:Int_Disable **************************************************/
+
 /* Function:Int_Print *********************************************************
 Description : Print a signed integer on the debugging console. This integer is
               printed as decimal with sign.

@@ -36,7 +36,7 @@ extern uint32_t SystemCoreClock;
 /* 内存分配相关定义 */
 #define configSUPPORT_STATIC_ALLOCATION                 0                       /* 1: 支持静态申请内存, 默认: 0 */
 #define configSUPPORT_DYNAMIC_ALLOCATION                1                       /* 1: 支持动态申请内存, 默认: 1 */
-#define configTOTAL_HEAP_SIZE                           ((size_t)(10 * 1024))   /* FreeRTOS堆中可用的RAM总量, 单位: Byte, 无默认需定义 */
+#define configTOTAL_HEAP_SIZE                           ((size_t)(32 * 1024))   /* FreeRTOS堆中可用的RAM总量, 单位: Byte, 无默认需定义 */
 #define configAPPLICATION_ALLOCATED_HEAP                0                       /* 1: 用户手动分配FreeRTOS内存堆(ucHeap), 默认: 0 */
 #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP       0                       /* 1: 用户自行实现任务创建时使用的内存申请与释放函数, 默认: 0 */
 
@@ -107,7 +107,7 @@ extern uint32_t FreeRTOSRunTimeTicks;
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
-#define configASSERT( x ) // ((void*)(x))  // if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+#define configASSERT( x )                               ((void*)(x))
 
 /* FreeRTOS MPU 特殊定义 */
 //#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS 0

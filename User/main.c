@@ -405,7 +405,7 @@ void Func_2(void* pvParameters)
     /* Mailbox tests */
     TEST_INIT();
     Test_Notify_2();
-    TEST_LIST("Task notifications                ");
+    TEST_LIST("Notification                      ");
 
     /* Semaphore tests */
     TEST_INIT();
@@ -415,7 +415,7 @@ void Func_2(void* pvParameters)
     /* Mailbox tests */
     TEST_INIT();
     Test_Bmq_2();
-    TEST_LIST("Blocking message queue            ");
+    TEST_LIST("Message queue                     ");
     
 #ifdef TEST_MEM_POOL
     /* Memory pool tests */
@@ -452,7 +452,7 @@ void Func_2(void* pvParameters)
     Total=Notify_ISR_Total;
     Max=Notify_ISR_Max;
     Min=Notify_ISR_Min;
-    TEST_LIST("ISR Mailbox                       ");
+    TEST_LIST("ISR Notification                  ");
     
     Total=Sem_ISR_Total;
     Max=Sem_ISR_Max;
@@ -462,7 +462,7 @@ void Func_2(void* pvParameters)
     Total=Bmq_ISR_Total;
     Max=Bmq_ISR_Max;
     Min=Bmq_ISR_Min;
-    TEST_LIST("ISR Blocking message queue        ");
+    TEST_LIST("ISR Message queue                 ");
     
     /* Test stop - Decide whether to exit, or keep dumping counter values
      * to detect potentially wrong timer clock rate configurations */

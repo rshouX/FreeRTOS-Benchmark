@@ -67,9 +67,9 @@ void Low_Lvl_Init(void)
     RCC_OscInitStructure.PLL.PLLN=432;
     RCC_OscInitStructure.PLL.PLLP=2;
     RCC_OscInitStructure.PLL.PLLQ=9;
-    configASSERT(HAL_RCC_OscConfig(&RCC_OscInitStructure)==HAL_OK);
+    HAL_RCC_OscConfig(&RCC_OscInitStructure);
     /* Overdrive to 216MHz */
-    configASSERT(HAL_PWREx_EnableOverDrive()==HAL_OK);
+    HAL_PWREx_EnableOverDrive();
    
     /* HCLK,PCLK1 & PCLK2 configuration */
     RCC_ClkInitStructure.ClockType=(RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2);
@@ -78,7 +78,7 @@ void Low_Lvl_Init(void)
     RCC_ClkInitStructure.APB1CLKDivider=RCC_HCLK_DIV4;
     RCC_ClkInitStructure.APB2CLKDivider=RCC_HCLK_DIV2;
     /* Flash latency = 7us, 8 CPU cycles */
-    configASSERT(HAL_RCC_ClockConfig(&RCC_ClkInitStructure,FLASH_LATENCY_7)==HAL_OK);
+    HAL_RCC_ClockConfig(&RCC_ClkInitStructure,FLASH_LATENCY_7);
    
     /* Cache/Flash ART enabling */
     SCB_EnableICache();
@@ -111,7 +111,7 @@ void Low_Lvl_Init(void)
    
     /* Set the priority of timer, svc and faults to the lowest */
     NVIC_SetPriorityGrouping(5U);
-    SysTick_Config(2160000U);
+    SysTick_Config(21600U);
 }
 /* End Function:Low_Lvl_Init *************************************************/
 

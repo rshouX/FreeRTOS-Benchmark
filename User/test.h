@@ -110,7 +110,7 @@ void Low_Lvl_Init(void)
     SCB->SHCSR|=(1U<<18U)|(1U<<17U)|(1U<<16U);
    
     /* Set the priority of timer, svc and faults to the lowest */
-    NVIC_SetPriorityGrouping(5U);
+    NVIC_SetPriorityGrouping(0U);
     SysTick_Config(21600U);
 }
 /* End Function:Low_Lvl_Init *************************************************/

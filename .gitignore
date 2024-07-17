@@ -1,4 +1,10 @@
+# STM32F767
+Debug
 DebugConfig
 *.uvguix.*
 *.uvoptx
 *.scvd
+
+# CH32V307
+obj
+.template

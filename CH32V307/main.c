@@ -40,6 +40,8 @@ while(0)
 do \
 { \
     Diff=(uint16_t)(End-Start); \
+    if(Diff>((uint16_t)(Start-End))) \
+        Diff=(uint16_t)(Start-End); \
     Total+=(Diff); \
     Max=(Diff)>(Max)?(Diff):(Max); \
     Min=(Diff)<(Min)?(Diff):(Min); \

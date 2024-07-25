@@ -91,6 +91,8 @@
 #define configMTIMECMP_BASE_ADDRESS  ( 0 )
 
 #define configUSE_PREEMPTION			1
+#define configUSE_TIME_SLICING          0
+#define configUSE_TICKLESS_IDLE         0
 #define configUSE_IDLE_HOOK				0
 #define configUSE_TICK_HOOK				0
 #define configCPU_CLOCK_HZ				SystemCoreClock
@@ -112,6 +114,11 @@
 #define configGENERATE_RUN_TIME_STATS	0
 /* different from STM32F7 */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
+#define configUSE_TASK_NOTIFICATIONS    1
+#define configUSE_QUEUE_SETS            1
+#define configUSE_ALTERNATIVE_API       0
+#define configSUPPORT_DYNAMIC_ALLOCATION                1
+
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 			0
@@ -122,8 +129,6 @@
 #define configTIMER_TASK_PRIORITY		( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH		4
 #define configTIMER_TASK_STACK_DEPTH	( configMINIMAL_STACK_SIZE )
-
-
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */

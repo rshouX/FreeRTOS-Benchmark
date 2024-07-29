@@ -92,7 +92,15 @@ not need to be guarded with a critical section. */
 
 /* Scheduler utilities. */
 extern void vTaskSwitchContext( void );
-#define portYIELD()   NVIC_SetPendingIRQ(Software_IRQn)
+
+#define portYIELD() \
+do \
+{ \
+    NVIC_SetPendingIRQ(Software_IRQn); \
+    __asm__ __volatile__("fence iorw,iorw":::"memory"); \
+} \
+while(0)
+
 #define portEND_SWITCHING_ISR( xSwitchRequired ) do { if( xSwitchRequired ) portYIELD(); } while( 0 )
 #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/

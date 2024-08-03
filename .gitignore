@@ -1,9 +1,12 @@
-# STM32F767
+# Keil
 Debug
 DebugConfig
 *.uvguix.*
 *.uvoptx
 *.scvd
 
-# CH32V307
+# GCC Makefile
+Object
+
+# MounRiver Studio
 obj

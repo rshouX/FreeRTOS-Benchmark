@@ -29,8 +29,6 @@ while(0)
 
 /* Global ********************************************************************/
 void Int_Handler(void);
-uint32_t Stack_1[256];
-uint32_t Stack_2[256];
 TIM_HandleTypeDef TIM2_Handle={0};
 TIM_HandleTypeDef TIM4_Handle={0};
 /* End Global ****************************************************************/

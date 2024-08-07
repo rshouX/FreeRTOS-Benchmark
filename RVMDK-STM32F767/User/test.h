@@ -109,7 +109,9 @@ void Low_Lvl_Init(void)
    
     /* Set the priority of timer, svc and faults to the lowest */
     NVIC_SetPriorityGrouping(0U);
-    SysTick_Config(21600U);
+
+    /* Cancel followling comment if SysTick is needed. *//* Cancel followling comment if SysTick is needed. */
+    //SysTick_Config(21600U);
 }
 /* End Function:Low_Lvl_Init *************************************************/
 

@@ -98,9 +98,9 @@ void Low_Lvl_Init(void)
     UART1_Handle.Init.HwFlowCtl=UART_HWCONTROL_NONE;
     UART1_Handle.Init.Mode=UART_MODE_TX;
     HAL_UART_Init(&UART1_Handle);
-		
-    /* Configure systick */
-    SysTick_Config(3600U);
+    
+    /* Cancel followling comment if SysTick is needed. */
+    //SysTick_Config(3600U);
 }
 /* End Function:Low_Lvl_Init *************************************************/
 

@@ -156,6 +156,11 @@ void Test_Bmq_1(void)
 
 void Func_1(void* pvParameters)
 {
+    /* Make sure to turn off SysTick completely. */
+    SysTick->CNT=0x00U;
+    SysTick->CMP=0x00U;
+    SysTick->CTLR=0x00U;
+
     Print_Str("Test (number in CPU cycles)        : AVG / MAX / MIN\r\n");
     vTaskPrioritySet(Thd_1,1U);
     
